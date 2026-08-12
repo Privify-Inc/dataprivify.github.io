@@ -74,6 +74,32 @@ roadmap. Security buyers find this out in the POC regardless; saying it first bu
 Related: the WFP driver still needs EV code signing (WKD-010) — not mentioned on the site,
 but it will come up in procurement.
 
+### Revision: the section was rebuilt after review
+
+The first version was flat — four uniform cards bolted inside the "How FORGE actually works"
+section with no boundary between them, immediately after three uniform cards. It read as more
+of the same and got skimmed. Three fixes:
+
+1. **It became a real `<section>`** on its own ground (`--surface`), so a visual break exists.
+2. **It moved ahead of "How FORGE actually works."** A reader already comparing us to a gateway
+   needs the wedge before the mechanism — the wedge is what earns them the mechanism.
+3. **It got a diagram.** The argument is about *coverage* — what falls inside a gateway's view
+   versus outside it — which is a spatial claim that was being made in prose. The new coverage
+   map shows a small dashed "what an MCP gateway sees" box inside a coral boundary labelled
+   "your environment — where FORGE runs", with the three blind spots visibly outside it.
+
+Built from CSS boxes rather than SVG so labels stay selectable and it reflows to one column on
+narrow screens. **No copy was lost** — all four differentiator cards keep their full text
+beneath the diagram, which summarises rather than replaces them.
+
+The three stage cards were also restyled into a connected sequence rail (01 → 02 → 03), since
+Discover → Observe → Govern genuinely is a sequence. All twelve detail bullets preserved
+verbatim. Page rhythm is now bordered containment → borderless sequence → dashed placeholders,
+instead of one card component repeated.
+
+New headline: **"The agents your gateway will never see"**, under the eyebrow
+"Why not just use a gateway?" — the buyer's own internal objection, in their words.
+
 ---
 
 ## 3. SOC 2 badge — spec §5
