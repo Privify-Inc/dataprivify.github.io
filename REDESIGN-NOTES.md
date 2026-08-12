@@ -143,11 +143,11 @@ on the roadmap."*
 
 **Bhaskar — worth a look.** It sat directly beneath the "Detection is not prevention" card,
 which makes a *preventive control* claim to precisely the audience that classifies controls for
-audit. Inline blocking is Windows-only today (`forge-context.md:685` — ETW is observation-only;
-the WFP driver is the enforcement path). Without the caveat on the page, a compliance buyer
-could carry "preventive control" into a control matrix where it holds on one OS only.
+audit. See the resolved position in §2 — inline blocking runs on all three platforms, but only
+the Windows kernel path is unconditional. Without a caveat somewhere on the site, a compliance
+buyer could record FORGE as a preventive control without knowing that distinction.
 
-The claim itself is still accurate — FORGE does prevent, on Windows. The question is whether
+The claim itself is accurate — FORGE does prevent. The question is whether
 the scope belongs on the homepage, in the sales conversation, or on `security.html`. Flagging,
 not overriding.
 
