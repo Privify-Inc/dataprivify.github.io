@@ -90,11 +90,11 @@ carries a status table spelling out exactly what does and doesn't exist.
 > against the Trust Services Criteria internally. If that's aspirational, the badge is a
 > liability in a vendor questionnaire, not an asset. Tell me and I'll pull it.
 
-### Colour: monochrome + coral, not cyan
+### Color: monochrome + coral, not cyan
 
-Spec §5 asked for cyan; spec §7 said don't invent brand colours. I resolved it against cyan
+Spec §5 asked for cyan; spec §7 said don't invent brand colors. I resolved it against cyan
 for two reasons — it appears nowhere else in the palette, and (more importantly) red/coral as
-the *dominant* colour on a compliance badge reads as "alert/fail" in security UI. The badge is
+the *dominant* color on a compliance badge reads as "alert/fail" in security UI. The badge is
 white/slate type on `--surface`, with coral used only as the shield outline stroke.
 
 **Built as inline SVG, not Canva.** For an on-site badge, SVG scales on retina, inherits your
@@ -125,7 +125,7 @@ now `padding:9rem 2rem 3.5rem` so the fork is the first thing resolved, per spec
 - **Before:** two cards below a full-viewport hero, both coral, SHIELD's label in grey. Header "Two products. Both in early access."
 - **After:** cards directly under the headline behind a "Choose your path" label, each with a top gradient rule, its own accent, an audience line ("For enterprises" / "For individuals") and a status chip.
 
-**New: SHIELD track colour `--cyan: #22D3EE`.** Spec §1 requires distinct visual treatment per
+**New: SHIELD track color `--cyan: #22D3EE`.** Spec §1 requires distinct visual treatment per
 track and none existed — both product pages ship an identical coral-only token set. Cyan-400
 matches the site's Tailwind-derived greys, sits near-complementary to coral so the tracks are
 instantly separable, and reads as protective rather than alarming.
