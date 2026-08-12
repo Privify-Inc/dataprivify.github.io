@@ -151,9 +151,13 @@ You confirmed **no auditor is engaged**, so "Audit In Progress" was not availabl
 The footer additionally states plainly: *"Privify is not SOC 2 certified."* `security.html`
 carries a status table spelling out exactly what does and doesn't exist.
 
-> ⚠️ **This still needs your confirmation.** "Aligned with" asserts you actually operate
-> against the Trust Services Criteria internally. If that's aspirational, the badge is a
-> liability in a vendor questionnaire, not an asset. Tell me and I'll pull it.
+> ✅ **Confirmed by Vishal, 12 Aug 2026.** Privify does operate against the Trust Services
+> Criteria internally, so "aligned with" is accurate and the badge stands. No auditor is
+> engaged and no CPA report exists — both stated plainly on the page and in the footer.
+>
+> One follow-up worth having ready: a buyer who reads "aligned with" will eventually ask
+> *which* controls and *how*. A short internal mapping document turns that question from an
+> awkward pause into a credibility moment. Not required to merge.
 
 ### Color: monochrome + coral, not cyan
 
