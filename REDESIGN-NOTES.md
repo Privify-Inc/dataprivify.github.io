@@ -284,6 +284,30 @@ sake. Applied to all five pages in this branch, not just the homepage.
 
 ---
 
+## 4b. Footer trust chips — decided 12 Aug 2026
+
+Runlayer's footer carries "SOC 2 Certified · HIPAA Compliant · GDPR Compliant". Ours carries:
+
+- **Aligned with SOC 2** — confirmed true by Vishal, see §3.
+- **13 frameworks in FORGE — HIPAA, GDPR, EU AI Act** — a product capability.
+
+Company-level "HIPAA Compliant" and "GDPR Compliant" chips were considered and **deliberately
+not published.** The distinction: `compliance.py` maps those frameworks so *customers* can
+report against them. A footer badge saying "HIPAA Compliant" instead asserts that Privify is a
+Business Associate that will sign a BAA and meets the Security Rule; "GDPR Compliant" asserts
+Privify's own processing meets the Regulation. Neither is evidenced anywhere in the repo, and
+a healthcare customer could rely on the HIPAA claim for their own posture.
+
+Vishal reviewed the three options and chose to keep the product framing. Worth noting it is
+also the strongest of the three commercially — thirteen frameworks reads better than three
+badges.
+
+**Upgrade path:** if a BAA and DPA are put in place, "HIPAA & GDPR ready · DPA and BAA
+available on request" is defensible without an audit. Full compliance chips need the
+underlying facts first.
+
+---
+
 ## 5. Pricing — spec §3
 
 FORGE only, no numeric prices. Three factors named (environment size, deployment model,
