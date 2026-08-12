@@ -220,7 +220,7 @@ All CTAs fire named Plausible events (`CTA_ForgeDemo`, `CTA_ShieldWaitlist`,
 
 - **How FORGE actually works** — three stages with concrete mechanics, addressing spec §4's "not just vision language"
 - **A gateway only sees what routes through it** — verified competitive positioning
-- **Social proof** — dashed placeholder slots, 5 logos + 2 quote/case-study slots
+- ~~**Social proof** — dashed placeholder slots~~ **removed 12 Aug.** Placeholder cells reading "LOGO SLOT 1" look worse on a live site than no section at all. Re-add when there are real logos, testimonials or a case study to put in them — the spec asked for placeholders only as a stopgap
 - **Pricing** — no numbers, contact-us model per spec §3
 - **SHIELD track** — kept mission/emotion-driven per spec §4
 - **Final CTA**
