@@ -195,6 +195,40 @@ they don't get mistaken for checked.
 
 ---
 
+## 4a. Text contrast — the grey ramp
+
+Vishal pointed at the body copy on `platform/index.html` ("Every AI agent in your enterprise
+shaped, governed…") and asked for that colour on smaller text. That colour is `--gray-400`
+`#9CA3AF`, which the homepage already used for `.section-sub` — so the real problem was
+everything *below* it. Measured against `--surface` `#0d0d0d`:
+
+| Token | Hex | Contrast | WCAG AA (4.5:1) |
+|---|---|---|---|
+| `--gray-400` | `#9CA3AF` | 7.66:1 | pass |
+| `--gray-500` | `#6B7280` | 4.02:1 | large text only |
+| `--gray-600` | `#4B5563` | **2.57:1** | **fail** |
+| `--gray-700` | `#374151` | **1.89:1** | **fail** |
+
+The *smallest* type was on the *lowest* contrast — mono detail bullets, coverage-map chip
+subs, the SOC 2 sub-line, pricing factors. 24 declarations sat below the accessibility floor.
+
+**Fix:** a three-step ramp where every step carrying reading text clears AA.
+
+- `#FFFFFF` — headings (19.4:1)
+- `#9CA3AF` — body and secondary copy (7.66:1) ← the colour requested
+- `#858C97` — new `--text-3`, small detail and mono lists (5.73:1)
+- `#6B7280` — de-emphasised labels only (4.02:1)
+
+`--gray-600` and `--gray-700` remain in the file but now style **borders and placeholder
+outlines only, never text**.
+
+**Hue was left alone deliberately.** The greys are cool (~218°) against a warm coral accent.
+That is a working pairing — the cool text is what makes the coral read as an accent. The
+defect was luminance, not hue, so warming the neutrals would have been a change for its own
+sake. Applied to all five pages in this branch, not just the homepage.
+
+---
+
 ## 5. Pricing — spec §3
 
 FORGE only, no numeric prices. Three factors named (environment size, deployment model,
