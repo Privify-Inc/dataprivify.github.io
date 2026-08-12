@@ -68,11 +68,23 @@ gap, so it survives competitive scrutiny in a way a feature checklist doesn't.
 without the legal and tonal risk of naming a competitor on your homepage. Say the word if you
 want it named.
 
-**Honesty disclosure included.** The FORGE section carries an explicit note that inline
-blocking is Windows-only today, with macOS/Linux monitored and enforcement parity on the
-roadmap. Security buyers find this out in the POC regardless; saying it first buys credibility.
-Related: the WFP driver still needs EV code signing (WKD-010) — not mentioned on the site,
-but it will come up in procurement.
+### ⚠️ Correction: "inline blocking is Windows-only" was wrong
+
+An earlier draft of this branch carried a scope note saying inline blocking was Windows-only.
+**That was my error and it has been removed.** On re-checking:
+
+`ai-activity-monitor/agent/internal/network/proxy.go` carries **no build tags** — it is
+platform-agnostic Go. Lines 157–163 return HTTP 403 "Blocked by AI Activity Monitor policy"
+whenever the policy engine says block in `ModeEnforce`. The Makefile ships `pkg-macos`,
+`pkg-linux` and `pkg-windows`.
+
+So inline blocking runs on **Windows, macOS and Linux**. What *is* Windows-only is
+**kernel-level** enforcement via the WFP callout driver, which applies policy at the TCP
+connect boundary. I generalised from that one mechanism to the whole capability, which
+understated the product. The FAQ now states the correct position.
+
+Still true and worth knowing for procurement: the WFP driver needs EV code signing
+(WKD-010), not yet obtained. Not mentioned on the site.
 
 ### Revision: the section was rebuilt after review
 
