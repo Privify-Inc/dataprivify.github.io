@@ -100,6 +100,45 @@ instead of one card component repeated.
 New headline: **"The agents your gateway will never see"**, under the eyebrow
 "Why not just use a gateway?" — the buyer's own internal objection, in their words.
 
+### Revision 2: cards rewritten for the executive buyer
+
+The four cards were still written for an engineer — WFP callouts, process signatures,
+listening ports. Rewritten for the actual buying committee (CISO, CXO, risk and compliance
+VPs, responsible-AI and legal leadership) as one line each, under the label
+"What that gap costs you":
+
+| Card | Line |
+|---|---|
+| Shadow AI you can't attest to | A control you cannot evidence will not survive an audit — and no one can evidence a model they never knew was running. |
+| Coverage numbers that flatter you | A gateway can only report the traffic that reached it, so the gap never appears in the percentage you take to the board. |
+| Detection is not prevention | Auditors separate a control that stops an action from a log that records one — only one of them satisfies a preventive requirement. |
+| Your largest exposure is human | Most AI incidents begin with an employee and a chat window, not an autonomous agent — the same policy has to reach both. |
+
+This also removed a real duplication: three of the four cards had been restating their own
+diagram chips twenty lines further down the page. The division is now clean — **chips state
+the technical gap, cards state what it costs.** Implementation detail belongs on
+`platform/index.html`, which already carries the technical sections.
+
+Layout moved from a 2x2 grid to a 4-across strip (2 at 900px, 1 at 768px). Fixed a bug found
+on the way: `.diff-card` used `--surface` as its background while sitting in a `--surface`
+section, so the cards were effectively invisible against their own ground. Now `--surface-2`.
+
+### ⚠️ The "On scope" note was removed at Vishal's request
+
+The section previously carried: *"Inline blocking is available on Windows today via the kernel
+driver. macOS and Linux endpoints are monitored and policy-evaluated, with enforcement parity
+on the roadmap."*
+
+**Bhaskar — worth a look.** It sat directly beneath the "Detection is not prevention" card,
+which makes a *preventive control* claim to precisely the audience that classifies controls for
+audit. Inline blocking is Windows-only today (`forge-context.md:685` — ETW is observation-only;
+the WFP driver is the enforcement path). Without the caveat on the page, a compliance buyer
+could carry "preventive control" into a control matrix where it holds on one OS only.
+
+The claim itself is still accurate — FORGE does prevent, on Windows. The question is whether
+the scope belongs on the homepage, in the sales conversation, or on `security.html`. Flagging,
+not overriding.
+
 ---
 
 ## 3. SOC 2 badge — spec §5
