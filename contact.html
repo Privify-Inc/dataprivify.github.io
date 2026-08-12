@@ -167,7 +167,7 @@
                     <div class="aside-item">
                         <i class="fa-solid fa-envelope"></i>
                         <div>
-                            <div class="ai-t"><a href="mailto:vishal.saxena@privify.io">vishal.saxena@privify.io</a></div>
+                            <div class="ai-t"><a href="mailto:vishal@privify.io">vishal@privify.io</a></div>
                             <div class="ai-s">Direct email, if you'd rather skip the form.</div>
                         </div>
                     </div>
@@ -290,7 +290,7 @@ const hdr = document.getElementById('header');
 window.addEventListener('scroll', () => hdr.classList.toggle('scrolled', window.pageYOffset > 50));
 
 //  Shares the Formspree endpoint used by the FORGE early-access form on platform/index.html
-//  Delivers to vishal.saxena@privify.io + bhaskar.tallamraju@privify.io
+//  Delivers to vishal@privify.io + bhaskar.tallamraju@privify.io
 const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/maqalveb';
 
 //  Prefill intent from the CTA that sent the visitor here, e.g. contact.html?intent=pricing
@@ -360,7 +360,7 @@ async function handleContact() {
     } catch (err) {
         btn.innerHTML = original;
         btn.disabled = false;
-        showError('Something went wrong sending your message. Please email us directly at vishal.saxena@privify.io and we’ll pick it up from there.');
+        showError('Something went wrong sending your message. Please email us directly at vishal@privify.io and we’ll pick it up from there.');
     }
 }
 </script>
