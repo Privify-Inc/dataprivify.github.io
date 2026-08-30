@@ -575,6 +575,44 @@ This is a governance company. The bot's own data handling has to survive inspect
 - **Anthropic API:** API traffic is not used for model training. Worth having the accurate line ready, because someone will ask.
 - **Privacy page:** add a short section describing Sentry, and link it from the widget header.
 
+**As built.**
+
+- The purge is a timer-triggered Function running daily at 03:17 UTC, driven by
+  `TRANSCRIPT_RETENTION_DAYS` (default 30) per addendum Item 4.3 — no hardcoded
+  30 in code. It projects only the two key columns and deletes in transactions
+  of 100 within the single partition, so a run moves almost no data and costs a
+  fraction of a cent a month. Deletion is bounded per run, so a backlog drains
+  over consecutive nights rather than turning one invocation into a bill.
+- **A second retention gap was found and closed.** Rate-limit counters are keyed
+  by IP address — personal data — and `checkAndIncrement` reset an expired
+  counter without ever removing the row, so every IP that reached the widget was
+  retained indefinitely in a table the transcript purge does not touch. The same
+  job now clears expired counters.
+- **"Transcripts are held 30 days" was already incomplete before Salesforce.**
+  The email and Teams sinks send the full transcript to the sales team at lead
+  capture, so a copy leaves Table Storage and lives under normal business
+  retention today. The privacy page says this explicitly rather than implying
+  the 30-day clock covers every copy. Addendum 4.4 anticipated this for
+  Salesforce; it was already true.
+- The retention number is stated in four places — the env var, the privacy page,
+  the widget header, and the system prompt — and only the first is executable.
+  `sentry-backend/README.md` lists all four together.
+- The "no transcript logging" rule is now enforced rather than trusted:
+  third-party error bodies are scrubbed **at the throw site**, where the
+  submitted values are known, and `describeError` at each logging call is the
+  backstop. The Teams sink logs status only, because its request body is the
+  transcript and any echo would be conversation text rather than one field.
+
+### Part 11 note — "never auto-opens", as implemented
+
+The widget reopens itself after a navigation **only when a stored transcript
+exists**. The reading taken: 4.2's rule protects a visitor who has not engaged,
+and on a fresh page view the transcript is empty and nothing opens. Once
+someone has deliberately opened Sentry and started talking, closing it on every
+internal link would lose their place, which is the behaviour the rule exists to
+prevent rather than require. An auditor checking "load a page, is it closed?"
+gets the expected answer.
+
 ---
 
 ## Part 9 — Cost
@@ -611,6 +649,30 @@ Later, Sentry should be able to walk a prospect through their own Scout report �
 - Session storage schema should tolerate an `authContext` field that Phase 1 leaves null.
 
 Do not build Phase 2 features. Do build the seams.
+
+**As built.** `assets/sentry/sentry.js` is now in two halves with a hard rule
+between them: nothing in the shell may mention selling, booking or Scout.
+
+- `PrivifyChat.createShell(config)` owns the chrome, theming, streaming, SSE
+  parsing, storage, session lifecycle and accessibility, and is exposed on
+  `window` so a second agent can call it. It takes the endpoint, copy, storage
+  namespace and root element id as configuration, so two shells can coexist on
+  one page without colliding.
+- Tool rendering is injected. The shell hands a renderer a deliberately narrow
+  surface — `el`, `appendMessage`, `appendCardNode`, `isSafeUrl`, `sendMessage`,
+  `open`, `close` — and no access to the session, the transport or the
+  transcript. Phase 2 supplies its own renderers for its own tools.
+- `restoreToolResult(tool)` lets an agent declare which of its cards survive a
+  navigation. Sentry excludes `check_availability`, whose buttons carry times
+  that may be stale by the time a visitor comes back to them.
+- The conversation-state layer is already agnostic: the client only ever sends
+  `{ sessionId, message }`, and `authContext` exists on the session and stays
+  null in Phase 1.
+
+Still welded to Phase 1, deliberately: the shell has no concept of
+authentication. Phase 2 needs a signed-in identity threaded from the page
+through session creation into `authContext`, and that is a security design
+decision, not a refactor to do speculatively now.
 
 ---
 

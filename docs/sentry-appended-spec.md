@@ -283,6 +283,25 @@ The privacy page and Sentry's own disclosure need updating to say so, in plain t
 
 Get this wording right before shipping the item. Privify sells governance; a retention statement that doesn't match what the system actually does is the single most damaging small error available here. Have a human approve the final wording.
 
+### 4.6 As built — 4.3 and 4.4 only
+
+Done early, alongside Part 8's purge job, because they are retention and
+privacy work rather than Salesforce work. **4.1 and 4.2 — the attachment
+itself — are not built.**
+
+- `TRANSCRIPT_RETENTION_DAYS` (default 30, capped at 365) drives the purge job.
+  No hardcoded 30 remains in code. It cannot be read by the three
+  visitor-facing places that also state the number, so `sentry-backend/README.md`
+  lists all four as one change.
+- **4.4 turned out to already apply.** The premise was that attaching
+  transcripts to Salesforce would make "held 30 days" incomplete. It was
+  incomplete before that: the email and Teams sinks already send the full
+  transcript to the sales team at lead capture. The privacy page now says so —
+  the 30-day clock covers our working copy, and a lead record created by asking
+  us to get in touch is kept under normal business retention.
+- The privacy wording is written but **not yet human-approved**, which this
+  section requires before shipping.
+
 ### 4.5 Stubbing
 
 If Salesforce credentials still aren't in place, this stays behind the no-op interface from Part 6.4. Build it, test it against the interface, ship it dark.
@@ -442,6 +461,30 @@ Every one of these is recognisable to this audience, and each converts a warm le
 3. Decline again → get the direct address, and no third ask
 4. Say "I just want to talk to a person" at turn 1 → immediate handover, no qualification
 5. Kill the backend, load the page → static fallback card with booking link and email
+
+### 7.7 As built
+
+Done alongside Parts 8–11, because the widget and prompt work overlapped almost
+completely.
+
+- **The two exits live in the panel header at all times** — a "Book a call"
+  button that starts the booking conversation, and `enterprise@privify.io` as a
+  plain, selectable `mailto`. Neither waits for Sentry to offer them.
+- **The static fallback is genuinely independent of us.** Both routes on it —
+  Microsoft's own Bookings page at
+  `https://outlook.office.com/book/Consult@privify.io/` and a `mailto` — work
+  with our Function App stopped, which is the only condition under which the
+  card appears. **Verified by actually stopping the backend** and sending a
+  message: card rendered, both links live, header exits intact. It renders once
+  per page view, since repeating it after each retry would be the nagging 7.4
+  forbids.
+- **The prompt gained a `NEVER_A_DEAD_END` section**: every deflection carries a
+  route, one email ask after a decline and never a second, and 7.4's banned list
+  written out — no exit interception, no repeated asks, no false scarcity, no
+  withholding an answer to force a booking, no guilt framing.
+
+Not yet done: 7.6's acceptance conversations 1–4, which exercise deflection
+behaviour that Item 2 defines. Worth running once, against both items together.
 
 ---
 
