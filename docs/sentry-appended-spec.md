@@ -87,9 +87,27 @@ so the offer reads like a person's ("Tuesday at 10 or 2") rather than the
 **`thinCalendar` is told, not inferred.** The shortlist is capped, so a full
 calendar and a nearly-empty one both return a handful of slots — only the
 pre-shortlist `totalOpen` distinguishes them. The prompt presents whatever
-slots exist *alongside* the email route rather than instead of them; the
-turn-cap wrap-up, the one path where the model does not write the reply, has
-its own empty-calendar copy.
+slots exist *alongside* the email route rather than instead of them.
+
+**Three outcomes, not two, wherever the calendar is consulted.** A failed
+lookup is not an empty diary, and treating them alike tells the visitor
+something false about the business. The widget therefore reserves "I'm having
+trouble pulling up the calendar" for an actual `error` and renders nothing at
+all for a genuinely empty one — Sentry's own message covers that — and the
+turn-cap wrap-up, the one path where the model does not write the reply,
+branches three ways in its own copy.
+
+**Verified with `BOOKING_HORIZON_DAYS=1`**, which cancels exactly against the
+24-hour minimum lead time and yields zero slots without touching the calendar.
+Sentry offered the email route, no card rendered, and no fault was claimed.
+
+**Times are labelled once, not six times.** `timeZoneName: 'short'` only
+produces real abbreviations for US zones — London renders `GMT+1` — so
+stamping it on every button is both noisy and ugly. The zone is named once
+under the card title, with each button carrying the bare time and the full
+"Monday, August 31 at 8:00 AM PDT" on `aria-label` and on the message a click
+sends. A horizon of a fortnight can straddle a DST change, so when the slots
+genuinely do not share a zone the widget falls back to labelling each button.
 
 **Two defects found while verifying, both pre-existing.** The conflict guard's
 ±1-day window was letting duplicates through (see the main spec's Section 6.5),
