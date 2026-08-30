@@ -538,7 +538,26 @@ This is a governance company. The bot's own data handling has to survive inspect
 - **Disclosure before capture.** The persistent header line, plus explicit acknowledgement at the point an email address is requested.
 - **Retention:** transcripts 30 days in Table Storage, then purged by a timer-triggered Function. Leads persist in Salesforce under normal CRM retention.
 - **Data residency:** deploy the Function and storage in the same region as existing Azure resources. If EU visitors are material, use an EU region.
-- **No transcript logging to Application Insights.** Log metadata — session ID, turn count, latency, token usage, errors — never message content. Configure sampling to exclude the request body explicitly; the default will capture it.
+- **No transcript logging to Application Insights.** Log metadata — session ID, turn count, latency, token usage, errors — never message content.
+
+  **Verified, and this section's original premise was wrong.** It claimed "the
+  default will capture [the request body]". It does not. Azure Functions'
+  `requests` telemetry records only metadata — URL, method, path, status,
+  duration, invocation/process IDs, user agent — with no request body. Queried
+  against the deployed app for five distinct visitor phrases across `traces`,
+  `requests`, `dependencies`, `customEvents` and `exceptions`: **zero matches**.
+  Client IP is masked by default. No sampling config is needed to prevent body
+  capture, because it never happens.
+
+  The real exposure is our own log lines, not the platform. Two rules follow:
+  never interpolate visitor-supplied text into a log message (a `Session
+  created` line once wrote an unvalidated `entryPage` — an injection payload at
+  the time — verbatim into 90-day telemetry), and be careful logging third-party
+  error objects, since Salesforce and Teams echo response bodies that can
+  contain submitted field values.
+
+  Note telemetry retention is 90 days, independent of the 30-day transcript
+  retention above.
 - **Anthropic API:** API traffic is not used for model training. Worth having the accurate line ready, because someone will ask.
 - **Privacy page:** add a short section describing Sentry, and link it from the widget header.
 
