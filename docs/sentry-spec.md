@@ -477,10 +477,24 @@ one failed silently rather than loudly, so treat them as load-bearing:
   responsibility, so `book_appointment` re-checks availability immediately
   before creating. This narrows the race between offer and confirm; it cannot
   close it, so a booking is best-effort rather than transactional.
-- **The conflict re-check must query a wide window, never just the slot.**
-  `getStaffAvailability` reports a booked slot as `available` when the query
-  range is narrowed to exactly that slot; the busy block only appears in a
-  wider query.
+- **The conflict re-check must reuse the offer's own query** — `now` to the end
+  of `BOOKING_HORIZON_DAYS` — not a window of its own. Whether
+  `getStaffAvailability` reports a slot as busy depends on the *shape* of the
+  window asked about, and not monotonically. Sweeping widths against a freshly
+  booked slot: the slot alone read `available`, and so did ±1 day, while
+  ±0.5 day, ±2 days, and every `now`-anchored window from 2 to 30 days
+  correctly read busy. An earlier version of this guard used ±1 day on the
+  theory that "wider is safer" and silently let duplicates through on every
+  slot tested — six in a row into the same 30 minutes. There is no reliable
+  width rule; reusing the query that produced the offer is the only defensible
+  choice, and it also guarantees the guard can never disagree with the offer.
+- **`maximumAdvance` is not enforced on this path either.** The business
+  declares `P7D` and the service `P15D`, but `getStaffAvailability` returns
+  slots 30 days out and `createAppointment` accepts them — verified by creating
+  and deleting appointments at 3, 9, 15, 22 and 29 days out, all `201`. Those
+  policies bind the self-service Bookings page only. The horizon is therefore
+  ours to choose via `BOOKING_HORIZON_DAYS`, with the corollary that nothing
+  external will stop us choosing one we cannot honour.
 - **`customerTimeZone` is accepted but not persisted.** The create response
   echoes the value back, yet reading the appointment afterwards returns `""`
   — true for appointments made through the Bookings page itself, so it is a

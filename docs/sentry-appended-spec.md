@@ -68,6 +68,39 @@ Nothing to change in the repo. Check in the Bookings admin, in this order:
 
 Add a fallback: if fewer than three slots are available across the whole horizon, Sentry should not present a thin, sad calendar. It should say the calendar is looking full and offer the email route instead (see Item 7). A near-empty picker reads as "nobody wants to talk to you" and costs you the lead.
 
+### 1.5 As built
+
+**Diagnosis.** A custom API call, not an iframe — 1.3 does not apply. Both
+predicted causes were present: a hardcoded 5-day window (`AVAILABILITY_WINDOW_DAYS`)
+and a `slice(0, 4)` shortlist. Pagination was *not* a cause: `getStaffAvailability`
+is a POST action returning no `@odata.nextLink`. The shortlist was the dominant
+cause — even the 5-day window was already enumerating 71 open slots across 4
+days before being cut to the first 4, which all fell on the first open day.
+
+**Fix.** `BOOKING_HORIZON_DAYS` (default 14, clamped 1–30) replaces the
+hardcoded window. The shortlist is now grouped by the visitor's *own* calendar
+day, capped at 3 days × 6 slots, and sampled at bucket centres within each day
+so the offer reads like a person's ("Tuesday at 10 or 2") rather than the
+8am/7:30pm extremes an even spread picks, with the soonest slot always kept.
+`check_availability` additionally returns `horizonDays` and `thinCalendar`.
+
+**`thinCalendar` is told, not inferred.** The shortlist is capped, so a full
+calendar and a nearly-empty one both return a handful of slots — only the
+pre-shortlist `totalOpen` distinguishes them. The prompt presents whatever
+slots exist *alongside* the email route rather than instead of them; the
+turn-cap wrap-up, the one path where the model does not write the reply, has
+its own empty-calendar copy.
+
+**Two defects found while verifying, both pre-existing.** The conflict guard's
+±1-day window was letting duplicates through (see the main spec's Section 6.5),
+and text streamed before and after a tool call ran together in one bubble with
+no break. Both fixed.
+
+**Residual, not fixed.** The calendar is published in Pacific working hours, so
+a visitor in London or Tokyo is legitimately offered late-evening or
+early-morning local times. Those slots are real and the labels are correct;
+filtering them would be a business-hours policy decision, not a bug fix.
+
 ---
 
 ## Item 2 — Scope and depth: stay high-level, deflect properly
