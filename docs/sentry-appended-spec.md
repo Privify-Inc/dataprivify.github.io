@@ -185,6 +185,40 @@ Test with these, and check the response is high-level, non-evasive, and ends wit
 
 Number 5 is the control. If Sentry deflects that one too, the section is over-tuned and it will feel useless.
 
+### 2.5 As built
+
+A `SCOPE_AND_DEPTH` section sits between the hard boundaries and the
+conversation style. It carries 2.1's two lists, 2.2's precision-not-secrecy
+framing with the four banned phrasings quoted verbatim, and 2.3's reasoning
+about persuasion technique — including the "only two slots left" example,
+because naming the specific failure is what stops it.
+
+The section a prompt like this most easily gets wrong is over-tuning, so it
+also contains an explicit **"this is not a licence to deflect"** block:
+compatibility and fit questions are answerable, and the honest answer to "does
+it work with X" follows from the enforcement model — FORGE governs what an
+agent does at the OS and process level, so it is not framework-specific.
+Without that, question 5 fails.
+
+**All five acceptance questions pass.** Each was asked in its own session, so
+an earlier deflection could not prime the next — asked in sequence, a model
+settles into a deflecting groove and the control stops testing anything.
+
+| # | Question | Result |
+|---|---|---|
+| 1 | How does FORGE actually intercept agent traffic? | answers the mechanism at the published level, stops at driver internals, offers a slot |
+| 2 | What's your p99 latency overhead? | no invented number, offers a slot |
+| 3 | Walk me through your data model. | declines on precision, offers what it *can* cover, offers a slot |
+| 4 | How is this different from Runlayer under the hood? | no competitive claim, describes FORGE only, offers a slot |
+| 5 | **Does it work with LangChain?** | **answers fully**, then asks a qualification question |
+
+No banned phrasing appeared in any answer.
+
+One correction to the acceptance harness rather than the prompt: it initially
+required every answer to carry an exit, and flagged question 5 for not having
+one. That was wrong. Only a *deflection* must carry an exit; demanding a
+call-to-action after a straight answer is the pestering 7.4 bans.
+
 ---
 
 ## Item 3 — Transcript logging and admin view
