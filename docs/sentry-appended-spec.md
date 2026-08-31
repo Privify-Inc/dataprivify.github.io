@@ -278,6 +278,50 @@ Sortable on Started, Turns, and Cost. Filterable on status and on whether a lead
 
 If the visitor pasted something credential-shaped, Sentry is already instructed to stop them (Part 3.4) — but it may already be in the transcript. Mask anything matching common key/token patterns at render time, with a click-to-reveal for a genuine investigation. Don't store the unmasked form in any new place.
 
+### 3.6 As built
+
+**Routed under `console`, not `admin`.** `admin` is reserved by the Azure
+Functions runtime for its own management API, and the collision does not fail
+loudly: the host logs "conflicts with one or more built in routes" and simply
+does not register the function, which is indistinguishable from a deploy that
+did nothing. Endpoints are `/api/console`, `/api/console/sessions` and
+`/api/console/sessions/{id}`.
+
+**Easy Auth is configured, and the app still serves the public widget.** The
+constraint the spec does not mention: Easy Auth applies to the whole Function
+App, and this one also hosts `/api/session` and `/api/chat` for every visitor
+to privify.io. Requiring authentication globally would have logged the entire
+public internet out of the product. So the platform is set to
+`AllowAnonymous` — it validates a token when one is present and injects the
+principal, but blocks nothing — and enforcement lives in the handler.
+
+The consequence is that authorisation is code after all, so it **fails
+closed**: no principal is 401, a principal from another tenant is 403, and a
+missing tenant configuration is 403 rather than an open door. Verified against
+the production shape, including that the local development bypass is inert
+whenever the runtime reports it is running in Azure.
+
+Live in production: `/api/console/sessions` returns 401 to an anonymous
+caller, `/api/console` returns 302 to Microsoft sign-in on the Privify tenant,
+and `/api/session` still returns 200 anonymously.
+
+**The UI is served by the Function App**, not from privify.io. That puts the
+page behind the same gate as the data instead of leaving a public shell that
+calls a protected API, and it removes the need for the separate admin CORS
+rule 3.3 asks for, because the request is same-origin.
+
+Read-only throughout, as specified. Retention stays with the purge job: an
+admin UI that can also delete can destroy the evidence of what it did.
+
+Redaction masks key-shaped strings at render time with click-to-reveal, and
+turns now record which tools fired — without that, "why did
+`check_availability` fire at turn 9" was unanswerable, which 3.4 calls most of
+the screen's value.
+
+**Entra app registration created**: `sentry-admin-console`, single-tenant, with
+its client secret in Key Vault and referenced by the app setting rather than
+stored in configuration.
+
 ---
 
 ## Item 4 — Attach transcripts to the Salesforce lead
@@ -380,6 +424,52 @@ Give Claude Code this, verbatim:
 
 Set an **Azure budget alert** on the resource group, and confirm the **Anthropic spend alert** from Part 9 actually exists. Both are two-minute jobs that are only ever done retroactively at the wrong moment.
 
+### 5.5 As built — audit findings
+
+`privify-sentry-rg` holds six resources and **nothing has a fixed monthly
+floor**. Part 9's assumption held.
+
+| Resource | Type | SKU / tier | Billing |
+|---|---|---|---|
+| `WestUS2LinuxDynamicPlan` | `Microsoft.Web/serverFarms` | **Y1, Dynamic** | per-execution |
+| `privify-sentry` | `Microsoft.Web/sites` | on the Y1 plan | per-execution |
+| `privifysentrystore` | `Microsoft.Storage/storageAccounts` | **Standard_LRS** | per-use |
+| `privify-sentry` | `Microsoft.Insights/components` | classic, 90-day retention | per-GB ingested |
+| `privify-sentry-kv` | `Microsoft.KeyVault/vaults` | **Standard** (family A) | per-operation |
+| Application Insights Smart Detection | `microsoft.insights/actiongroups` | — | free |
+
+Against 5.2's checklist: Consumption confirmed (`Y1`/`Dynamic`, not EP or an
+App Service plan). `alwaysOn: false`, `preWarmedInstanceCount: 0`. Storage is
+LRS, not GRS. Key Vault is Standard, not Premium/HSM. **No Log Analytics
+workspace was created**, so 5.3's silent-provisioning concern does not apply.
+Nothing unlisted is present.
+
+**One real finding, and it is the one 5.3 predicted.** Application Insights
+was on defaults, which means a **100 GB/day** ingestion cap. At roughly
+$2.30/GB that is about $230/day if it were ever reached, on an app that
+produces a few megabytes. The cap was never a guardrail at that height.
+Reduced to **1 GB/day** — still around 100x headroom for this workload, but it
+bounds the damage from a log loop or an abusive traffic spike to a couple of
+dollars, and hitting it is itself a signal that something is wrong.
+
+Retention was left at 90 days deliberately: App Insights includes 90 days at
+no extra charge, so cutting it saves nothing and only shortens the window for
+diagnosing an incident. Sampling is already enabled in `host.json` with
+`excludedTypes: Request`.
+
+**Budget alert created**: `sentry-monthly`, $25/month on the resource group,
+notifying `vishal@privify.io` at 50% actual, 90% actual, and 100% forecast.
+$25 is deliberately far above the expected spend — it is an anomaly detector,
+not a limit, and it should never fire in normal operation.
+
+**Not verified: actual billed cost.** `az consumption usage list` returns the
+records with `pretaxCost` as null on this subscription, and the Cost
+Management query API rate-limited. The configuration audit above is
+definitive; the dollar figure needs the portal.
+
+**Still outstanding — needs a human**: the Anthropic spend alert in 5.4 lives
+in the Anthropic console, which has no CLI. It has to be confirmed by hand.
+
 ---
 
 ## Item 6 — Cost telemetry: per session and per period
@@ -444,6 +534,30 @@ Show for the selected period:
 Cost per qualified lead is the headline. Against any other channel Privify uses, it should win by an order of magnitude, and being able to state it precisely is worth more than the saving itself.
 
 Watch average cost per conversation over time. If it climbs, either the system prompt has grown or prompt caching has silently stopped working — the second is common and invisible without this metric.
+
+### 6.5 As built
+
+Usage is captured per turn and accumulated on the session, summed across the
+tool-use rounds inside a turn because one visitor message can cost several API
+calls. All four fields: ignoring the cache figures understates a real
+three-turn conversation by about 20%, since writes bill at 1.25x input and
+reads at 0.1x.
+
+Rates are config (`ANTHROPIC_RATE_*_PER_MTOK`). An unparseable rate falls back
+to the published price rather than to zero — a typo that silently reported
+everything as free would be worse than a crash.
+
+The dashboard follows the date filter, as 6.4 requires, and shows all six
+metrics. Cost per qualified lead is null rather than $0.00 when there are no
+leads in range.
+
+**A measurement worth acting on.** Verified against a live conversation: the
+first turn writes the cache (~7,500 tokens, $0.023) and subsequent turns cost
+around $0.009 each at a 69% hit rate. That puts a fifteen-turn conversation
+nearer **$0.15 than Part 9's $0.02–0.05 estimate** — the original figure looks
+optimistic by roughly 3–7x. Not a problem at any plausible volume, but the
+per-lead maths in Part 9 should be revised from measurement rather than
+carried forward.
 
 ---
 
