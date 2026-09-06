@@ -339,7 +339,7 @@ and the wrong title. All four were linked from the live footer.
 > not a lawyer and these are legal instruments. They are a large improvement on four pages that
 > all claimed to be a privacy policy and said "coming soon" — but that's the bar they clear.
 
-New addresses referenced: `security@privify.io`, `privacy@privify.io`, `legal@privify.io`.
+New addresses referenced: `security@privify.io`, `sales@privify.io`, `sales@privify.io`.
 **These need to exist or route somewhere.**
 
 ---
@@ -379,7 +379,7 @@ in full.
 ## 9. Open decisions
 
 1. **Is "aligned with SOC 2" actually true?** Gates the badge.
-2. **Do `security@`, `privacy@`, `legal@privify.io` exist?**
+2. **Do `security@`, `privacy@`, `sales@privify.io` exist?**
 3. **Name Runlayer explicitly?** Currently category-level only.
 4. **Align `platform/index.html` to 13 frameworks?**
 5. **Delete the dead cloud-upload path in Photo Scrubber?**
