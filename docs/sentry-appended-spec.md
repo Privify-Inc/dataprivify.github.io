@@ -458,7 +458,7 @@ diagnosing an incident. Sampling is already enabled in `host.json` with
 `excludedTypes: Request`.
 
 **Budget alert created**: `sentry-monthly`, $25/month on the resource group,
-notifying `vishal@privify.io` at 50% actual, 90% actual, and 100% forecast.
+notifying `sales@privify.io` at 50% actual, 90% actual, and 100% forecast.
 $25 is deliberately far above the expected spend — it is an anomaly detector,
 not a limit, and it should never fire in normal operation.
 

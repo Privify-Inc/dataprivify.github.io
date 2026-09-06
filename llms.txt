@@ -87,6 +87,6 @@ capabilities, not certifications held by Privify.
 
 - [Careers](https://privify.io/careers.html)
 - [Contact](https://privify.io/contact.html)
-- General enquiries: vishal@privify.io
+- General enquiries: sales@privify.io
 - Security issues: security@privify.io
 - Privacy: privacy@privify.io
